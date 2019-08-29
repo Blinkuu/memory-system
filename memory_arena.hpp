@@ -7,11 +7,11 @@ template<typename Allocator>
 class MemoryArena {
     public:
         template<typename T>
-        [[nodiscard]] T* Allocate(size_t bytes, size_t alignment = sizeof(T)) noexcept;
+            [[nodiscard]] T* Allocate(size_t bytes, size_t alignment = sizeof(T)) noexcept;
 
         template<typename T>
-        void Free(T* ptr) noexcept;
-        //private:
+            void Free(T* ptr) noexcept;
+    private:
         Allocator m_Allocator;
 };
 

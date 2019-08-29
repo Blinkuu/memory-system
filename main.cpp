@@ -1,16 +1,34 @@
 #include <iostream>
 
-#include "memory_arena.h"
-#include "stack_allocator.h"
+#include "bald_memory.hpp"
 
+template<typename T>
 struct Point {
-    int x = 10;
-    int y = 5;
+    Point(T _x = 10.0f, T _y = 15.0f) : x(_x), y(_y) {
+        std::cout << __PRETTY_FUNCTION__ << '\n';
+    }
+    
+    ~Point() {
+        std::cout << __PRETTY_FUNCTION__ << '\n';
+    }
+
+    T x;
+    T y;
 };
 
 int main() {
-    MemoryArena<StackAllocator<1024>> arena;
+    using Point = Point<float>;
+    using Arena = MemoryArena<StackAllocator<1024>>;
     
-    auto* x = arena.Allocate<Point>(sizeof(Point));
-    arena.Free<Point>(x);
+    Arena arena;
+    
+    auto* p = bald_new<Point>(arena, 1.0f, 2.0f);
+
+    std::cout << "[" << p->x << ", " << p->y << "]\n";
+    
+    bald_delete(p, arena);
+
+    auto* p2 = bald_new_array<Point>(5, arena);
+
+    bald_delete_array(p2, arena);
 }

@@ -5,7 +5,7 @@ class StackAllocator {
     public:
         [[nodiscard]] void* Allocate(size_t bytes) noexcept;
         void Free(void* ptr) noexcept;
-    //private:
+    private:
         uint8_t m_Begin[Size];
         uint8_t* m_End = m_Begin + Size;
         uint8_t* m_Current = m_Begin;
