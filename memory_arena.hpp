@@ -6,18 +6,20 @@
 template<typename Allocator>
 class MemoryArena {
     public:
-        template<typename T>
-            [[nodiscard]] T* Allocate(size_t bytes, size_t alignment = sizeof(T)) noexcept;
+        constexpr MemoryArena() = default;
 
         template<typename T>
-            void Free(T* ptr) noexcept;
+            [[nodiscard]] constexpr T* Allocate(const size_t bytes, const size_t alignment = sizeof(T)) noexcept;
+
+        template<typename T>
+            constexpr void Free(const T* ptr) noexcept;
     private:
         Allocator m_Allocator;
 };
 
 template<typename Allocator>
 template<typename T>
-T* MemoryArena<Allocator>::Allocate(size_t bytes, size_t alignment) noexcept {
+constexpr T* MemoryArena<Allocator>::Allocate(const size_t bytes, const size_t alignment) noexcept {
     //ASSERT(alignment >= 1 && alignment <= 128); // no need for more alignment
     //ASSERT(alignment & (alignment - 1) == 0); //power of 2!
 
@@ -38,8 +40,8 @@ T* MemoryArena<Allocator>::Allocate(size_t bytes, size_t alignment) noexcept {
 
 template<typename Allocator>
 template<typename T>
-void MemoryArena<Allocator>::Free(T* ptr) noexcept {
-    uint8_t* alignedPtrAsU8 = reinterpret_cast<uint8_t*>(ptr);
+constexpr void MemoryArena<Allocator>::Free(const T* ptr) noexcept {
+    const uint8_t* alignedPtrAsU8 = reinterpret_cast<const uint8_t*>(ptr);
     uintptr_t alignedPtr = reinterpret_cast<uintptr_t>(ptr);
     ptrdiff_t adjustment = alignedPtrAsU8[-1];
 
