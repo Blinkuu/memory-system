@@ -17,6 +17,9 @@ struct Point {
 };
 
 int main() {
+
+    // FIX ALIGNMENT! IT MESSES UP WITH ARRAY ALLOCATION, BECAUSE OF ADDITIONAL 4 BYTES I STORE TO MANAGE
+    // CONSTRUCTION AND DESTRUCTION OF OBJECTS
     using Point = Point<float>;
     using Arena = MemoryArena<StackAllocator<1024>>;
     
