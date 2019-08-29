@@ -4,20 +4,20 @@
 #include "memory_arena.hpp"
 
 template<typename T, typename Arena, typename ... Args>
-T* bald_new(Arena& arena, Args&& ... args) {
+constexpr T* bald_new(Arena& arena, Args&& ... args) noexcept {
     T* p = arena.template Allocate<T>(sizeof(T), sizeof(T));
-    ::new (p) T;
+    ::new (p) T(args ...);
     return p;
 }
 
 template<typename T, typename Arena>
-void bald_delete(T* ptr, Arena& arena) {
+constexpr void bald_delete(T* ptr, Arena& arena) noexcept {
     ptr->~T();
     arena.template Free<T>(ptr);
 }
 
 template<typename T, typename Arena, typename ... Args>
-T* bald_new_array(size_t size, Arena& arena, Args** ... args) {
+constexpr T* bald_new_array(size_t size, Arena& arena, Args&& ... args) noexcept {
     T* p = arena.template Allocate<T>(sizeof(T) * size + sizeof(size_t), sizeof(T));
 
     size_t* asSizeT = reinterpret_cast<size_t*>(p);
@@ -27,13 +27,13 @@ T* bald_new_array(size_t size, Arena& arena, Args** ... args) {
     T* const pastLast = p + size;
 
     while(p < pastLast)
-        new (p++) T;
+        new (p++) T(args ...);
 
     return p - size;
 }
 
 template<typename T, typename Arena>
-void bald_delete_array(T* ptr, Arena& arena) {
+constexpr void bald_delete_array(T* ptr, Arena& arena) noexcept {
     size_t* asSizeT = reinterpret_cast<size_t*>(ptr);
     const size_t size = asSizeT[-1];
 

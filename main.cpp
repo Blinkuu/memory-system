@@ -1,5 +1,7 @@
 #include <iostream>
 #include <chrono>
+#include <cmath>
+
 #include "bald_memory.hpp"
 
 template<typename T>
@@ -25,32 +27,10 @@ int main() {
 
     Arena arena;
 
-    auto start = std::chrono::system_clock::now();
-    for(size_t i = 0; i < 10e6; i++) {
-        auto* p = bald_new<Point>(arena, i % 10, i % 20);
-        
-        auto[x, y] = p->GetPosition();
-        uint32_t sum = x + y;
-         
-        bald_delete(p, arena);
-    }
-    auto end = std::chrono::system_clock::now();
-    std::chrono::duration<double> elapsed_seconds = end-start;
-    std::cout<< "elapsed time: " << elapsed_seconds.count() << "s\n";
-
-
-    start = std::chrono::system_clock::now();
-    for(size_t i = 0; i < 10e6; i++) {
-        auto* p = new Point(i % 10, i % 20);
-        
-        auto[x, y] = p->GetPosition();
-        uint32_t sum = x + y;
-         
-        delete p;
-    }
-    end = std::chrono::system_clock::now();
-    elapsed_seconds = end - start;
-    std::cout<< "elapsed time: " << elapsed_seconds.count() << "s\n";
+    auto* p = bald_new<Point>(arena, 1.0f, 2.0f);
+    const auto[x, y] = p->GetPosition();
+    std::cout << x << '\t' << y << '\n';
+    bald_delete(p, arena);
 
     //auto* p2 = bald_new_array<Point>(5, arena);
     //bald_delete_array(p2, arena);
