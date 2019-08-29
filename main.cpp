@@ -28,12 +28,10 @@ int main() {
     Arena arena;
     
     auto* p = bald_new<Point>(arena, 1.0f, 2.0f);
-
-    std::cout << "[" << p->x << ", " << p->y << "]\n";
-    
     bald_delete(p, arena);
 
     auto* p2 = bald_new_array<Point>(5, arena);
-
     bald_delete_array(p2, arena);
+
+    return 0;
 }
