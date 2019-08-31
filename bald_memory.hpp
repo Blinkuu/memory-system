@@ -1,12 +1,14 @@
 #pragma once
 
+#include <utility>
+
 #include "stack_allocator.hpp"
 #include "memory_arena.hpp"
 
 template<typename T, typename Arena, typename ... Args>
 constexpr T* bald_new(Arena& arena, Args&& ... args) noexcept {
     T* p = arena.template Allocate<T>(sizeof(T), sizeof(T));
-    ::new (p) T(args ...);
+    ::new (p) T(std::forward<Args>(args) ...);
     return p;
 }
 
@@ -27,7 +29,7 @@ constexpr T* bald_new_array(size_t size, Arena& arena, Args&& ... args) noexcept
     T* const pastLast = p + size;
 
     while(p < pastLast)
-        new (p++) T(args ...);
+        new (p++) T(std::forward<Args>(args) ...);
 
     return p - size;
 }
