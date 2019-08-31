@@ -43,7 +43,7 @@ int main() {
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_sec = end-start;
 
-    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_sec).count() << "ms \n";
+    std::cout << "bald_new: " << std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_sec).count() << "ms \n";
 
     start = std::chrono::system_clock::now();
     for(size_t i = 0; i < 10e6; ++i) {
@@ -54,7 +54,7 @@ int main() {
     end = std::chrono::system_clock::now();
     elapsed_sec = end-start;
 
-    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_sec).count() << "ms \n";
+    std::cout << "new: " << std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_sec).count() << "ms \n";
 
     //auto* p2 = bald_new_array<Point>(5, arena);
     //bald_delete_array(p2, arena);
