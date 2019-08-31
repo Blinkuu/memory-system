@@ -5,24 +5,7 @@
 
 #include "stack_allocator.hpp"
 #include "memory_arena.hpp"
-
-template<typename T>
-struct TypeAndSize {};
-
-template<typename T, size_t N>
-struct TypeAndSize<T[N]> {
-    using type = T;
-    static constexpr size_t size = N;
-};
-
-template< bool>
-struct IsPODToType {};
-
-template<>
-struct IsPODToType<false> {}; 
-
-using PODType = IsPODToType<true>;
-using NonPODType = IsPODToType<false>;
+#include "bald_traits.hpp"
 
 template<typename T, typename Arena>
 constexpr void bald_delete(T* ptr, Arena& arena) noexcept {
