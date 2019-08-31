@@ -60,9 +60,14 @@ int main() {
     end = std::chrono::system_clock::now();
     elapsed_sec = end-start;
 
-    std::cout << "new: " << std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_sec).count() << "ms \n";
+    std::cout << "new: " << std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_sec).count() << "ms \n\n";
 
-    auto* p2 = bald_new_array(Point[5], arena);
+    std::cout << "Passing arguments to non pod constructors while constructing array works:\n";
+    auto* p2 = bald_new_array(Point[5], arena, 7, 13);
+    for(size_t i = 0; i < 5; ++i) {
+        auto[x, y] = p2[i].GetPosition();
+        std::cout << x << '\t' << y << '\n';
+    }
     bald_delete_array(p2, arena);
 
     auto* p3 = bald_new_array(X[5], arena);

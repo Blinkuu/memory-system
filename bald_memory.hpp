@@ -60,5 +60,5 @@ constexpr void bald_delete_array(PODType, T* ptr, Arena& arena) noexcept {
 #define bald_new(TYPE, ARENA) ::new (ARENA.Allocate<TYPE>(sizeof(TYPE), sizeof(TYPE))) TYPE
 #define bald_delete(PTR, ARENA) bald_delete(PTR, ARENA)
 
-#define bald_new_array(TYPE, ARENA) bald_new_array<TypeAndSize<TYPE>::type>(IsPODToType<std::is_pod<TYPE>::value>(), TypeAndSize<TYPE>::size, ARENA)
+#define bald_new_array(TYPE, ARENA, ...) bald_new_array<TypeAndSize<TYPE>::type>(IsPODToType<std::is_pod<TYPE>::value>(), TypeAndSize<TYPE>::size, ARENA, ## __VA_ARGS__)
 #define bald_delete_array(PTR, ARENA) bald_delete_array(PTR, ARENA)
