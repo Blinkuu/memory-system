@@ -1,16 +1,28 @@
 #pragma once
 
 #include <utility>
+#include <type_traits>
 
 #include "stack_allocator.hpp"
 #include "memory_arena.hpp"
 
-template<typename T, typename Arena, typename ... Args>
-constexpr T* bald_new(Arena& arena, Args&& ... args) noexcept {
-    T* p = arena.template Allocate<T>(sizeof(T), sizeof(T));
-    ::new (p) T(std::forward<Args>(args) ...);
-    return p;
-}
+template<typename T>
+struct TypeAndSize {};
+
+template<typename T, size_t N>
+struct TypeAndSize<T[N]> {
+    using type = T;
+    static constexpr size_t size = N;
+};
+
+template< bool>
+struct IsPODToType {};
+
+template<>
+struct IsPODToType<false> {}; 
+
+using PODType = IsPODToType<true>;
+using NonPODType = IsPODToType<false>;
 
 template<typename T, typename Arena>
 constexpr void bald_delete(T* ptr, Arena& arena) noexcept {
@@ -19,7 +31,7 @@ constexpr void bald_delete(T* ptr, Arena& arena) noexcept {
 }
 
 template<typename T, typename Arena, typename ... Args>
-constexpr T* bald_new_array(size_t size, Arena& arena, Args&& ... args) noexcept {
+constexpr T* bald_new_array(NonPODType, size_t size, Arena& arena, Args&& ... args) noexcept {
     T* p = arena.template Allocate<T>(sizeof(T) * size + sizeof(size_t), sizeof(T));
 
     size_t* asSizeT = reinterpret_cast<size_t*>(p);
@@ -35,7 +47,17 @@ constexpr T* bald_new_array(size_t size, Arena& arena, Args&& ... args) noexcept
 }
 
 template<typename T, typename Arena>
+constexpr T* bald_new_array(PODType, size_t size, Arena& arena) noexcept {
+    return arena. template Allocate<T>(sizeof(T) * size, sizeof(T));
+}
+
+template<typename T, typename Arena>
 constexpr void bald_delete_array(T* ptr, Arena& arena) noexcept {
+    bald_delete_array(IsPODToType<std::is_pod<T>::value>(), ptr, arena);
+}
+
+template<typename T, typename Arena>
+constexpr void bald_delete_array(NonPODType, T* ptr, Arena& arena) noexcept {
     size_t* asSizeT = reinterpret_cast<size_t*>(ptr);
     const size_t size = asSizeT[-1];
 
@@ -45,3 +67,15 @@ constexpr void bald_delete_array(T* ptr, Arena& arena) noexcept {
 
     arena.template Free<T>(reinterpret_cast<T*>(asSizeT - 1));
 }
+
+template<typename T, typename Arena>
+constexpr void bald_delete_array(PODType, T* ptr, Arena& arena) noexcept {
+    arena.template Free<T>(ptr);
+}
+
+#define bald_new_aligned(TYPE, ARENA, ALIGNMENT) ::new (ARENA.Allocate<TYPE>(sizeof(TYPE), ALIGNMENT)) TYPE
+#define bald_new(TYPE, ARENA) ::new (ARENA.Allocate<TYPE>(sizeof(TYPE), sizeof(TYPE))) TYPE
+#define bald_delete(PTR, ARENA) bald_delete(PTR, ARENA)
+
+#define bald_new_array(TYPE, ARENA) bald_new_array<TypeAndSize<TYPE>::type>(IsPODToType<std::is_pod<TYPE>::value>(), TypeAndSize<TYPE>::size, ARENA)
+#define bald_delete_array(PTR, ARENA) bald_delete_array(PTR, ARENA)

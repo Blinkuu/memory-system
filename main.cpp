@@ -5,6 +5,7 @@
 
 #include "bald_memory.hpp"
 
+// NON POD TYPE
 template<typename T>
 struct Point {
     Point(T _x = 10.0f, T _y = 15.0f) : x(_x), y(_y) {}
@@ -15,6 +16,11 @@ struct Point {
 
     T x;
     T y;
+};
+
+// POD TYPE
+struct X {
+    int x;
 };
 
 int main() {
@@ -36,7 +42,7 @@ int main() {
 
     auto start = std::chrono::system_clock::now();
     for(size_t i = 0; i < 10e6; ++i) {
-        auto* p = bald_new<Point>(arena, std::rand(), std::rand());
+        auto* p = bald_new(Point, arena)(1, 2);
         const auto[x, y] = p->GetPosition();
         bald_delete(p, arena);
     }
@@ -56,8 +62,11 @@ int main() {
 
     std::cout << "new: " << std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_sec).count() << "ms \n";
 
-    //auto* p2 = bald_new_array<Point>(5, arena);
-    //bald_delete_array(p2, arena);
+    auto* p2 = bald_new_array(Point[5], arena);
+    bald_delete_array(p2, arena);
+
+    auto* p3 = bald_new_array(X[5], arena);
+    bald_delete_array(p3, arena);
 
     return 0;
 }
