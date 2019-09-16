@@ -3,7 +3,7 @@
 #include <cmath>
 #include <cstdlib>
 
-#include "bald_memory.hpp"
+#include "include/bald_memory.hpp"
 
 // NON POD TYPE
 template<typename T>
@@ -24,13 +24,6 @@ struct X {
 };
 
 int main() {
-
-    // FIX ALIGNMENT! IT MESSES UP WITH ARRAY ALLOCATION, BECAUSE OF ADDITIONAL 4 BYTES I STORE TO MANAGE
-    // CONSTRUCTION AND DESTRUCTION OF OBJECTS
-    //
-    // RESEARCH IF THERE IS A WAY TO CALL PLACEMENT NEW (OR CONSTRUCTOR) IN CONSTEXPR MANNER!
-    //
-    // ALSO, MAYBE USE STD::VARIANT AS UNION TO SIMPLIFY CASTING IN ALLOCATORS
     std::srand(std::time(nullptr));
 
     using Point = Point<int>;
